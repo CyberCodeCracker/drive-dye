@@ -26,6 +26,7 @@ const App = () => (
           <Route path="/trajet/:id" element={<TripDetail />} />
           <Route path="/publier" element={<PublishTrip />} />
           <Route path="/reservation/:id" element={<Reservation />} />
+          <Route path="/evaluer/:id" element={<ReviewTrip />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -54,8 +54,9 @@ const Reservation = () => {
               <p className="font-bold text-primary text-lg">Total : {trip.price * seats} €</p>
             </CardContent>
           </Card>
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center flex-wrap">
             <Button variant="outline" onClick={() => navigate("/")}>Retour à l'accueil</Button>
+            <Button variant="outline" onClick={() => navigate(`/evaluer/${trip.id}`)}>⭐ Évaluer le trajet</Button>
             <Button onClick={() => navigate("/recherche")} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">Chercher un autre trajet</Button>
           </div>
         </div>
