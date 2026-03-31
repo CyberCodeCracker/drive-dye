@@ -21,7 +21,7 @@ const Index = () => {
   const [passengers, setPassengers] = useState("1");
 
   const handleSearch = () => {
-    navigate(`/recherche?from=${departure}&to=${arrival}&date=${date ? format(date, 'yyyy-MM-dd') : ''}&passengers=${passengers}`);
+    navigate(`/recherche?from=${departure}&to=${arrival}&startDate=${startDate ? format(startDate, 'yyyy-MM-dd') : ''}&endDate=${endDate ? format(endDate, 'yyyy-MM-dd') : ''}&passengers=${passengers}`);
   };
 
   return (
