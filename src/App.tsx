@@ -8,6 +8,7 @@ import SearchResults from "./pages/SearchResults.tsx";
 import TripDetail from "./pages/TripDetail.tsx";
 import PublishTrip from "./pages/PublishTrip.tsx";
 import Reservation from "./pages/Reservation.tsx";
+import ReviewTrip from "./pages/ReviewTrip.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
