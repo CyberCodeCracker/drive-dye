@@ -44,7 +44,7 @@ const Index = () => {
           {/* Search bar */}
           <Card className="max-w-4xl mx-auto shadow-xl border-0">
             <CardContent className="p-4 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                 <div className="relative md:col-span-1">
                   <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
