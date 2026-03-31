@@ -8,6 +8,7 @@ import SearchResults from "./pages/SearchResults.tsx";
 import TripDetail from "./pages/TripDetail.tsx";
 import PublishTrip from "./pages/PublishTrip.tsx";
 import Reservation from "./pages/Reservation.tsx";
+import ReviewTrip from "./pages/ReviewTrip.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/trajet/:id" element={<TripDetail />} />
           <Route path="/publier" element={<PublishTrip />} />
           <Route path="/reservation/:id" element={<Reservation />} />
+          <Route path="/evaluer/:id" element={<ReviewTrip />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
