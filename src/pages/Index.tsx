@@ -16,7 +16,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [departure, setDeparture] = useState("");
   const [arrival, setArrival] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const [passengers, setPassengers] = useState("1");
 
   const handleSearch = () => {
