@@ -16,11 +16,12 @@ const Index = () => {
   const navigate = useNavigate();
   const [departure, setDeparture] = useState("");
   const [arrival, setArrival] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const [passengers, setPassengers] = useState("1");
 
   const handleSearch = () => {
-    navigate(`/recherche?from=${departure}&to=${arrival}&date=${date ? format(date, 'yyyy-MM-dd') : ''}&passengers=${passengers}`);
+    navigate(`/recherche?from=${departure}&to=${arrival}&startDate=${startDate ? format(startDate, 'yyyy-MM-dd') : ''}&endDate=${endDate ? format(endDate, 'yyyy-MM-dd') : ''}&passengers=${passengers}`);
   };
 
   return (
@@ -43,7 +44,7 @@ const Index = () => {
           {/* Search bar */}
           <Card className="max-w-4xl mx-auto shadow-xl border-0">
             <CardContent className="p-4 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                 <div className="relative md:col-span-1">
                   <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -64,13 +65,24 @@ const Index = () => {
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("justify-start text-left font-normal", !date && "text-muted-foreground")}>
+                    <Button variant="outline" className={cn("justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
                       <Calendar className="mr-2 h-4 w-4" />
-                      {date ? format(date, "d MMM yyyy", { locale: fr }) : "Date"}
+                      {startDate ? format(startDate, "d MMM yyyy", { locale: fr }) : "Date début"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent mode="single" selected={date} onSelect={setDate} initialFocus className="p-3 pointer-events-auto" />
+                    <CalendarComponent mode="single" selected={startDate} onSelect={setStartDate} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "d MMM yyyy", { locale: fr }) : "Date fin"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent mode="single" selected={endDate} onSelect={setEndDate} disabled={(d) => startDate ? d < startDate : false} initialFocus className="p-3 pointer-events-auto" />
                   </PopoverContent>
                 </Popover>
                 <div className="relative">
