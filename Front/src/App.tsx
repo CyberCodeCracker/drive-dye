@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import SearchResults from "./pages/SearchResults.tsx";
@@ -13,9 +13,21 @@ import PublishTrip from "./pages/PublishTrip.tsx";
 import Reservation from "./pages/Reservation.tsx";
 import ReviewTrip from "./pages/ReviewTrip.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import DriverReservations from "./pages/DriverReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
+
+/**
+ * Wrapper that redirects admin users from "/" to "/admin"
+ */
+const HomeRedirect = () => {
+  const { isAdmin } = useAuth();
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Index />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -26,7 +38,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<HomeRedirect />} />
               <Route path="/login" element={<Login />} />
               <Route path="/recherche" element={<SearchResults />} />
               <Route path="/trajet/:id" element={<TripDetail />} />
@@ -34,6 +46,7 @@ const App = () => (
               <Route path="/reservation/:id" element={<Reservation />} />
               <Route path="/evaluer/:id" element={<ReviewTrip />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/mes-reservations" element={<DriverReservations />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

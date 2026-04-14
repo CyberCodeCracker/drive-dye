@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight, Loader2, Lock } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Lock, AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -24,7 +24,7 @@ interface Trajet {
 const Reservation = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [trajet, setTrajet] = useState<Trajet | null>(null);
   const [placesDisponibles, setPlacesDisponibles] = useState(0);
   const [seats, setSeats] = useState(1);
@@ -33,6 +33,7 @@ const Reservation = () => {
   const [confirmed, setConfirmed] = useState(false);
   const [reservationId, setReservationId] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [bookingError, setBookingError] = useState("");
 
   useEffect(() => {
     const fetchTrajet = async () => {
@@ -91,18 +92,23 @@ const Reservation = () => {
     );
   }
 
+  // Check if user is the driver of this trip
+  const isOwnTrip = user && trajet && trajet.conducteur.id === user.id;
+
   const handleConfirm = async () => {
     setSubmitting(true);
+    setBookingError("");
     try {
       const { data } = await api.post("/reservations", {
-        trajet_id: trajet.id,
+        trajet_id: trajet!.id,
         nb_places_reservees: seats,
       });
       setReservationId(data.reservation.id);
       setConfirmed(true);
-      toast({ title: "Réservation effectuée !", description: `${seats} place${seats > 1 ? "s" : ""} réservée${seats > 1 ? "s" : ""} pour ${trajet.depart} → ${trajet.destination}` });
+      toast({ title: "Réservation effectuée !", description: `${seats} place${seats > 1 ? "s" : ""} réservée${seats > 1 ? "s" : ""} pour ${trajet!.depart} → ${trajet!.destination}` });
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Une erreur est survenue.";
+      setBookingError(msg);
       toast({ title: "Erreur", description: msg, variant: "destructive" });
     } finally {
       setSubmitting(false);
@@ -226,11 +232,23 @@ const Reservation = () => {
                     <span className="text-primary">{total} €</span>
                   </div>
                 </div>
+                {isOwnTrip && (
+                  <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>Vous ne pouvez pas réserver votre propre trajet.</span>
+                  </div>
+                )}
+                {bookingError && !isOwnTrip && (
+                  <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{bookingError}</span>
+                  </div>
+                )}
                 <Button
                   className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
                   size="lg"
                   onClick={handleConfirm}
-                  disabled={submitting || placesDisponibles === 0}
+                  disabled={submitting || placesDisponibles === 0 || !!isOwnTrip}
                 >
                   {submitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Envoi...</> : "Confirmer la réservation"}
                 </Button>

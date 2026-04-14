@@ -158,4 +158,30 @@ class ReservationController extends Controller
 
         return response()->json($reservations);
     }
+
+    /**
+     * Refuser réservation — par le conducteur
+     */
+    public function reject(Request $request, Reservation $reservation): JsonResponse
+    {
+        if ($reservation->trajet->conducteur_id !== $request->user()->id) {
+            return response()->json(['message' => 'Non autorisé.'], 403);
+        }
+
+        if ($reservation->statut !== 'en_attente') {
+            return response()->json(['message' => 'Impossible de refuser cette réservation.'], 422);
+        }
+
+        $reservation->update(['statut' => 'annulee']);
+
+        Notification::create([
+            'user_id' => $reservation->voyageur_id,
+            'message' => "Votre réservation pour {$reservation->trajet->depart} → {$reservation->trajet->destination} a été refusée par le conducteur.",
+        ]);
+
+        return response()->json([
+            'message'     => 'Réservation refusée.',
+            'reservation' => $reservation->fresh(),
+        ]);
+    }
 }

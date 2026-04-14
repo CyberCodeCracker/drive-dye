@@ -272,11 +272,11 @@ const PublishTrip = () => {
             </Card>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="gap-2" onClick={() => validate() && setPreview(true)}>
+              <Button variant="outline" className="flex-1 gap-2" size="lg" onClick={() => validate() && setPreview(true)}>
                 <Eye className="h-4 w-4" /> Aperçu
               </Button>
-              <Button className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold" onClick={handlePublish} disabled={loading}>
-                {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Publication...</> : "Publier le trajet"}
+              <Button className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold gap-2" size="lg" onClick={handlePublish} disabled={loading}>
+                {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Publication...</> : <><PlusCircle className="h-4 w-4" />Publier le trajet</>}
               </Button>
             </div>
           </div>

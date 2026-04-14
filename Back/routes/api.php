@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show']);
     Route::put('/reservations/{reservation}/confirm', [ReservationController::class, 'confirm']);
     Route::put('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
+    Route::put('/reservations/{reservation}/reject', [ReservationController::class, 'reject']);
 
     // Avis
     Route::post('/avis', [AvisController::class, 'store']);

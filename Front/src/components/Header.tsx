@@ -1,9 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Car, Menu, X, Search, PlusCircle, User, LayoutDashboard, LogOut, Bell } from "lucide-react";
+import { Car, Menu, X, Search, PlusCircle, User, LayoutDashboard, LogOut, Bell, ChevronDown, Settings, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -18,7 +26,7 @@ const Header = () => {
   };
 
   const navLinks = [
-    { to: "/recherche", label: "Rechercher", icon: Search, show: true },
+    { to: "/recherche", label: "Rechercher", icon: Search, show: !isAdmin },
     { to: "/publier", label: "Publier un trajet", icon: PlusCircle, show: isDriver },
     { to: "/admin", label: "Admin", icon: LayoutDashboard, show: isAdmin },
   ].filter((l) => l.show);
@@ -49,15 +57,56 @@ const Header = () => {
           ))}
 
           {isAuthenticated ? (
-            <div className="flex items-center gap-1 ml-2">
-              <span className="text-sm font-medium px-3 py-1 rounded-md bg-muted text-muted-foreground">
-                <User className="inline h-3.5 w-3.5 mr-1" />
-                {user?.name}
-              </span>
-              <Button variant="ghost" size="sm" className="gap-2 text-destructive hover:text-destructive" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-                Déconnexion
-              </Button>
+            <div className="ml-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 px-3">
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
+                      <span className="text-xs font-bold text-primary">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="font-medium text-sm max-w-[120px] truncate">{user?.name}</span>
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-xs text-primary capitalize">{user?.role}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {isDriver && (
+                    <DropdownMenuItem onClick={() => navigate("/publier")} className="cursor-pointer gap-2">
+                      <PlusCircle className="h-4 w-4" />
+                      Publier un trajet
+                    </DropdownMenuItem>
+                  )}
+                  {isDriver && (
+                    <DropdownMenuItem onClick={() => navigate("/mes-reservations")} className="cursor-pointer gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Réservations reçues
+                    </DropdownMenuItem>
+                  )}
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer gap-2">
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard Admin
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Déconnexion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <Button variant="outline" size="sm" className="gap-2 ml-2" onClick={() => navigate("/login")}>
@@ -86,7 +135,17 @@ const Header = () => {
           ))}
           {isAuthenticated ? (
             <>
-              <p className="text-sm text-muted-foreground px-3 py-1">Connecté en tant que <strong>{user?.name}</strong></p>
+              <div className="px-3 py-2 border-t mt-2 pt-3">
+                <p className="text-sm font-medium">{user?.name}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
+                <p className="text-xs text-primary capitalize mt-1">{user?.role}</p>
+              </div>
+              {isDriver && (
+                <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => { navigate("/mes-reservations"); setMobileOpen(false); }}>
+                  <BookOpen className="h-4 w-4" />
+                  Réservations reçues
+                </Button>
+              )}
               <Button variant="ghost" className="w-full justify-start gap-2 text-destructive" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
                 Déconnexion

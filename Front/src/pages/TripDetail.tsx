@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MapPin, Users, Music, MessageCircle, Cigarette, Dog, Package, Car, Shield, ArrowRight, Loader2, Calendar } from "lucide-react";
+import { Star, MapPin, Users, Music, MessageCircle, Cigarette, Dog, Package, Car, Shield, ArrowRight, Loader2, Calendar, AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import api from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Conducteur {
   id: number;
@@ -44,6 +45,7 @@ interface Trajet {
 const TripDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [trajet, setTrajet] = useState<Trajet | null>(null);
   const [placesDisponibles, setPlacesDisponibles] = useState(0);
   const [avis, setAvis] = useState<Avis[]>([]);
@@ -261,14 +263,21 @@ const TripDetail = () => {
                   <Users className="h-4 w-4" />
                   {placesDisponibles} place{placesDisponibles > 1 ? "s" : ""} disponible{placesDisponibles > 1 ? "s" : ""}
                 </div>
-                <Button
-                  className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
-                  size="lg"
-                  disabled={placesDisponibles === 0 || trajet.statut !== "actif"}
-                  onClick={() => navigate(`/reservation/${trajet.id}`)}
-                >
-                  {placesDisponibles === 0 ? "Complet" : "Réserver ce trajet"}
-                </Button>
+                {user && trajet.conducteur.id === user.id ? (
+                  <div className="flex items-center gap-2 text-sm bg-destructive/20 text-white p-3 rounded-lg">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>Vous ne pouvez pas réserver votre propre trajet.</span>
+                  </div>
+                ) : (
+                  <Button
+                    className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
+                    size="lg"
+                    disabled={placesDisponibles === 0 || trajet.statut !== "actif"}
+                    onClick={() => navigate(`/reservation/${trajet.id}`)}
+                  >
+                    {placesDisponibles === 0 ? "Complet" : "Réserver ce trajet"}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>

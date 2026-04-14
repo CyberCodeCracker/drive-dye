@@ -28,7 +28,7 @@ class TrajetController extends Controller
             $query->whereDate('date_heure', $request->date);
         }
 
-        $trajets = $query->orderBy('date_heure', 'asc')->paginate(15);
+        $trajets = $query->orderBy('date_heure', 'asc')->paginate(9);
 
         return response()->json($trajets);
     }
