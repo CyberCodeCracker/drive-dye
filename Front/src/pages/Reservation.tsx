@@ -19,6 +19,7 @@ interface Trajet {
   prix_min: number;
   nb_places: number;
   conducteur: { id: number; name: string };
+  reservations?: { id: number; voyageur_id: number; nb_places_reservees: number; statut: string }[];
 }
 
 const Reservation = () => {
@@ -34,6 +35,7 @@ const Reservation = () => {
   const [reservationId, setReservationId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [bookingError, setBookingError] = useState("");
+  const [isModifying, setIsModifying] = useState(false);
 
   useEffect(() => {
     const fetchTrajet = async () => {
@@ -42,7 +44,21 @@ const Reservation = () => {
       try {
         const { data } = await api.get(`/trajets/${id}`);
         setTrajet(data.trajet);
-        setPlacesDisponibles(data.places_disponibles ?? 0);
+        const disponibles = data.places_disponibles ?? 0;
+
+        // Check if user already has an active reservation
+        const myRes = data.trajet.reservations?.find(
+          (r: any) => r.voyageur_id === user?.id && (r.statut === "en_attente" || r.statut === "confirmee")
+        );
+        if (myRes) {
+          setIsModifying(true);
+          setSeats(myRes.nb_places_reservees);
+          setReservationId(myRes.id);
+          // Add back the user's current seats to the available pool
+          setPlacesDisponibles(disponibles + myRes.nb_places_reservees);
+        } else {
+          setPlacesDisponibles(disponibles);
+        }
       } catch {
         setError("Trajet introuvable ou erreur de chargement.");
       } finally {
@@ -50,7 +66,7 @@ const Reservation = () => {
       }
     };
     fetchTrajet();
-  }, [id]);
+  }, [id, user]);
 
   // Auth guard
   if (!isAuthenticated) {
@@ -105,7 +121,7 @@ const Reservation = () => {
       });
       setReservationId(data.reservation.id);
       setConfirmed(true);
-      toast({ title: "Réservation effectuée !", description: `${seats} place${seats > 1 ? "s" : ""} réservée${seats > 1 ? "s" : ""} pour ${trajet!.depart} → ${trajet!.destination}` });
+      toast({ title: isModifying ? "Réservation modifiée !" : "Réservation effectuée !", description: `${seats} place${seats > 1 ? "s" : ""} réservée${seats > 1 ? "s" : ""} pour ${trajet!.depart} → ${trajet!.destination}` });
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Une erreur est survenue.";
       setBookingError(msg);
@@ -135,9 +151,12 @@ const Reservation = () => {
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
             <CheckCircle2 className="h-10 w-10 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold">Réservation envoyée !</h1>
+          <h1 className="text-3xl font-bold">{isModifying ? "Réservation modifiée !" : "Réservation envoyée !"}</h1>
           <p className="text-muted-foreground">
-            Vous avez demandé {seats} place{seats > 1 ? "s" : ""} pour le trajet {trajet.depart} → {trajet.destination} le {date} à {time}. En attente de confirmation du conducteur.
+            {isModifying
+              ? `Votre réservation a été mise à jour : ${seats} place${seats > 1 ? "s" : ""} pour le trajet ${trajet.depart} → ${trajet.destination} le ${date} à ${time}.`
+              : `Vous avez demandé ${seats} place${seats > 1 ? "s" : ""} pour le trajet ${trajet.depart} → ${trajet.destination} le ${date} à ${time}. En attente de confirmation du conducteur.`
+            }
           </p>
           <Card className="border-0 shadow-md text-left">
             <CardContent className="p-5 space-y-2">
@@ -149,11 +168,6 @@ const Reservation = () => {
           </Card>
           <div className="flex gap-3 justify-center flex-wrap">
             <Button variant="outline" onClick={() => navigate("/")}>Retour à l'accueil</Button>
-            {reservationId && (
-              <Button variant="outline" onClick={() => navigate(`/evaluer/${reservationId}`)}>
-                ⭐ Évaluer le trajet
-              </Button>
-            )}
             <Button onClick={() => navigate("/recherche")} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
               Chercher un autre trajet
             </Button>
@@ -169,8 +183,8 @@ const Reservation = () => {
         <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate(`/trajet/${id}`)}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold mb-2">Réserver votre trajet</h1>
-        <p className="text-muted-foreground mb-8">Vérifiez les détails et confirmez votre réservation.</p>
+        <h1 className="text-3xl font-bold mb-2">{isModifying ? "Modifier votre réservation" : "Réserver votre trajet"}</h1>
+        <p className="text-muted-foreground mb-8">{isModifying ? "Modifiez le nombre de places souhaitées." : "Vérifiez les détails et confirmez votre réservation."}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div className="md:col-span-3 space-y-6">
@@ -253,7 +267,7 @@ const Reservation = () => {
                   onClick={handleConfirm}
                   disabled={submitting || placesDisponibles === 0 || !!isOwnTrip}
                 >
-                  {submitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Envoi...</> : "Confirmer la réservation"}
+                  {submitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Envoi...</> : isModifying ? "Modifier la réservation" : "Confirmer la réservation"}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">La réservation sera confirmée par le conducteur.</p>
               </CardContent>

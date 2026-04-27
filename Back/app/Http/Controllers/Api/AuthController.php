@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Avis;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,6 +111,44 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Profil mis à jour.',
             'user'    => $request->user()->fresh(),
+        ]);
+    }
+
+    /**
+     * Profil public d'un conducteur avec ses avis
+     */
+    public function conducteurProfile(User $user): JsonResponse
+    {
+        // Get all avis linked to this driver's trajets
+        $avis = Avis::whereHas('reservation.trajet', function ($query) use ($user) {
+            $query->where('conducteur_id', $user->id);
+        })
+            ->with(['voyageur:id,name', 'reservation.trajet:id,depart,destination'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $noteMoyenne = $avis->avg('note');
+
+        // Count stats
+        $totalTrajets = $user->trajets()->where('statut', 'actif')->count();
+        $totalReservations = $user->trajets()
+            ->withCount(['reservations' => fn($q) => $q->where('statut', 'confirmee')])
+            ->get()
+            ->sum('reservations_count');
+
+        return response()->json([
+            'conducteur' => [
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'role'       => $user->role,
+                'phone'      => $user->phone,
+                'created_at' => $user->created_at,
+            ],
+            'avis'              => $avis,
+            'note_moyenne'      => round($noteMoyenne ?? 0, 2),
+            'total_avis'        => $avis->count(),
+            'total_trajets'     => $totalTrajets,
+            'total_passagers'   => $totalReservations,
         ]);
     }
 }

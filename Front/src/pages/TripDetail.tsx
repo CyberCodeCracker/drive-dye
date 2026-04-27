@@ -182,6 +182,11 @@ const TripDetail = () => {
 
   const activeReservations = trajet.reservations?.filter((r) => r.statut !== "annulee") ?? [];
 
+  // Check if current user already has an active reservation for this trip
+  const myReservation = user
+    ? trajet.reservations?.find((r) => r.voyageur_id === user.id && (r.statut === "en_attente" || r.statut === "confirmee"))
+    : null;
+
   return (
     <Layout>
       <div className="container py-8">
@@ -352,7 +357,7 @@ const TripDetail = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Driver profile */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 shadow-lg cursor-pointer hover:shadow-xl transition-shadow" onClick={() => navigate(`/conducteur/${trajet.conducteur.id}`)}>
               <CardContent className="p-6 text-center space-y-4">
                 <Avatar className="h-20 w-20 mx-auto ring-4 ring-primary/20">
                   <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
@@ -384,6 +389,7 @@ const TripDetail = () => {
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">Membre depuis {memberYear}</p>
+                <p className="text-xs text-primary font-medium">Voir le profil →</p>
               </CardContent>
             </Card>
 
@@ -402,6 +408,29 @@ const TripDetail = () => {
                   <div className="flex items-center gap-2 text-sm bg-destructive/20 text-white p-3 rounded-lg">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     <span>Vous ne pouvez pas réserver votre propre trajet.</span>
+                  </div>
+                ) : myReservation ? (
+                  <div className="space-y-3">
+                    <div className="bg-white/10 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Votre réservation</span>
+                        {myReservation.statut === "en_attente" ? (
+                          <Badge className="bg-amber-500/20 text-amber-200 border-0 gap-1 text-xs"><Clock className="h-3 w-3" />En attente</Badge>
+                        ) : (
+                          <Badge className="bg-emerald-500/20 text-emerald-200 border-0 gap-1 text-xs"><CheckCircle2 className="h-3 w-3" />Confirmée</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-primary-foreground/80">
+                        {myReservation.nb_places_reservees} place{myReservation.nb_places_reservees > 1 ? "s" : ""} réservée{myReservation.nb_places_reservees > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
+                      size="lg"
+                      onClick={() => navigate(`/reservation/${trajet.id}`)}
+                    >
+                      Modifier réservation
+                    </Button>
                   </div>
                 ) : (
                   <Button

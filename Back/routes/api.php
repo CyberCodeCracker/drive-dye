@@ -23,6 +23,7 @@ Route::get('/trajets', [TrajetController::class, 'index']);
 Route::get('/trajets/search', [TrajetController::class, 'search']);
 Route::get('/trajets/{trajet}', [TrajetController::class, 'show']);
 Route::get('/trajets/{trajet}/avis', [AvisController::class, 'index']);
+Route::get('/conducteurs/{user}', [AuthController::class, 'conducteurProfile']);
 
 /*
 |--------------------------------------------------------------------------

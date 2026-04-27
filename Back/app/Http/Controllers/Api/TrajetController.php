@@ -181,6 +181,7 @@ class TrajetController extends Controller
     public function mesTrajets(Request $request): JsonResponse
     {
         $trajets = $request->user()->trajets()
+            ->where('statut', '!=', 'annule')
             ->with('reservations')
             ->orderBy('date_heure', 'desc')
             ->paginate(15);

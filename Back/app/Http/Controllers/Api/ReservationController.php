@@ -85,7 +85,7 @@ class ReservationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $reservations = $request->user()->reservations()
-            ->with(['trajet.conducteur'])
+            ->with(['trajet.conducteur', 'avis'])
             ->orderBy('date_reservation', 'desc')
             ->paginate(15);
 

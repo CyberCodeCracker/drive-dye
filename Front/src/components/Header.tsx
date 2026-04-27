@@ -150,6 +150,12 @@ const Header = () => {
                       Réservations reçues
                     </DropdownMenuItem>
                   )}
+                  {!isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/reservations")} className="cursor-pointer gap-2">
+                      <BookOpen className="h-4 w-4" />
+                      Mes réservations
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer gap-2">
                       <LayoutDashboard className="h-4 w-4" />
@@ -228,6 +234,12 @@ const Header = () => {
                 <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => { navigate("/mes-reservations"); setMobileOpen(false); }}>
                   <BookOpen className="h-4 w-4" />
                   Réservations reçues
+                </Button>
+              )}
+              {!isAdmin && (
+                <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => { navigate("/reservations"); setMobileOpen(false); }}>
+                  <BookOpen className="h-4 w-4" />
+                  Mes réservations
                 </Button>
               )}
               <Button variant="ghost" className="w-full justify-start gap-2 text-destructive" onClick={handleLogout}>
