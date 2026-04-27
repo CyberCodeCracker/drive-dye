@@ -427,7 +427,7 @@ const Login = () => {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowRegPassword((prev) => !prev)}
+                            onClick={() => { setShowRegPassword((prev) => !prev); setShowRegConfirm((prev) => !prev); }}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             aria-label={showRegPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                             aria-pressed={showRegPassword}
@@ -455,7 +455,7 @@ const Login = () => {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowRegConfirm((prev) => !prev)}
+                            onClick={() => { setShowRegPassword((prev) => !prev); setShowRegConfirm((prev) => !prev); }}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             aria-label={showRegConfirm ? "Masquer la confirmation du mot de passe" : "Afficher la confirmation du mot de passe"}
                             aria-pressed={showRegConfirm}

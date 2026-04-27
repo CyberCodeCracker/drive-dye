@@ -85,6 +85,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/trajets', [AdminController::class, 'trajets']);
         Route::put('/trajets/{trajet}', [AdminController::class, 'updateTrajet']);
+        Route::put('/trajets/{trajet}/approve', [AdminController::class, 'approveTrajet']);
+        Route::put('/trajets/{trajet}/reject', [AdminController::class, 'rejectTrajet']);
         Route::delete('/trajets/{trajet}', [AdminController::class, 'deleteTrajet']);
 
         Route::get('/dashboard', [AdminController::class, 'dashboard']);

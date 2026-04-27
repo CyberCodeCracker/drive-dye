@@ -92,7 +92,7 @@ class TrajetController extends Controller
      */
     public function show(Trajet $trajet): JsonResponse
     {
-        $trajet->load(['conducteur', 'reservations.avis']);
+        $trajet->load(['conducteur', 'reservations.voyageur', 'reservations.avis']);
 
         return response()->json([
             'trajet'             => $trajet,
@@ -118,10 +118,12 @@ class TrajetController extends Controller
             'genre'          => 'nullable|string|max:50',
         ]);
 
-        $trajet = $request->user()->trajets()->create($validated);
+        $trajet = $request->user()->trajets()->create(array_merge($validated, [
+            'statut' => 'en_attente',
+        ]));
 
         return response()->json([
-            'message' => 'Trajet créé avec succès.',
+            'message' => 'Trajet soumis avec succès. Il sera visible après approbation par un administrateur.',
             'trajet'  => $trajet,
         ], 201);
     }
@@ -146,7 +148,7 @@ class TrajetController extends Controller
             'bagage'         => 'nullable|string|max:100',
             'fumeur'         => 'boolean',
             'genre'          => 'nullable|string|max:50',
-            'statut'         => 'in:actif,annule,termine',
+            'statut'         => 'in:en_attente,actif,annule,termine',
         ]);
 
         $trajet->update($validated);

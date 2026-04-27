@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Reservation;
 use App\Models\Trajet;
 use App\Models\User;
@@ -75,7 +76,7 @@ class AdminController extends Controller
     public function updateTrajet(Request $request, Trajet $trajet): JsonResponse
     {
         $validated = $request->validate([
-            'statut' => 'sometimes|in:actif,annule,termine',
+            'statut' => 'sometimes|in:en_attente,actif,annule,termine',
         ]);
 
         $trajet->update($validated);
@@ -83,6 +84,50 @@ class AdminController extends Controller
         return response()->json([
             'message' => 'Trajet mis à jour.',
             'trajet'  => $trajet->fresh(),
+        ]);
+    }
+
+    /**
+     * Approuver un trajet (admin)
+     */
+    public function approveTrajet(Trajet $trajet): JsonResponse
+    {
+        if ($trajet->statut !== 'en_attente') {
+            return response()->json(['message' => 'Ce trajet ne peut pas être approuvé.'], 422);
+        }
+
+        $trajet->update(['statut' => 'actif']);
+
+        Notification::create([
+            'user_id' => $trajet->conducteur_id,
+            'message' => "Votre trajet {$trajet->depart} → {$trajet->destination} a été approuvé par l'administrateur.",
+        ]);
+
+        return response()->json([
+            'message' => 'Trajet approuvé.',
+            'trajet'  => $trajet->fresh()->load('conducteur'),
+        ]);
+    }
+
+    /**
+     * Rejeter un trajet (admin)
+     */
+    public function rejectTrajet(Trajet $trajet): JsonResponse
+    {
+        if ($trajet->statut !== 'en_attente') {
+            return response()->json(['message' => 'Ce trajet ne peut pas être rejeté.'], 422);
+        }
+
+        $trajet->update(['statut' => 'annule']);
+
+        Notification::create([
+            'user_id' => $trajet->conducteur_id,
+            'message' => "Votre trajet {$trajet->depart} → {$trajet->destination} a été refusé par l'administrateur.",
+        ]);
+
+        return response()->json([
+            'message' => 'Trajet rejeté.',
+            'trajet'  => $trajet->fresh()->load('conducteur'),
         ]);
     }
 
@@ -109,6 +154,7 @@ class AdminController extends Controller
             'total_conducteurs'  => User::where('role', 'conducteur')->count(),
             'total_trajets'      => Trajet::count(),
             'trajets_actifs'     => Trajet::where('statut', 'actif')->count(),
+            'trajets_en_attente' => Trajet::where('statut', 'en_attente')->count(),
             'total_reservations' => Reservation::count(),
             'reservations_confirmees' => Reservation::where('statut', 'confirmee')->count(),
             'reservations_en_attente' => Reservation::where('statut', 'en_attente')->count(),

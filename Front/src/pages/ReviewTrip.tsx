@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Star, CheckCircle2, Loader2, Lock } from "lucide-react";
+import { Star, CheckCircle2, Loader2, Lock, ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -161,6 +161,9 @@ const ReviewTrip = () => {
   return (
     <Layout>
       <div className="container py-8 max-w-2xl">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <h1 className="text-3xl font-bold mb-2">Évaluer votre trajet</h1>
         <p className="text-muted-foreground mb-8">Partagez votre expérience pour aider les autres voyageurs.</p>
 

@@ -10,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { MapPin, CalendarIcon, Clock, Users, PlusCircle, Trash2, Eye, Car, Loader2, Lock, DollarSign } from "lucide-react";
+import { MapPin, CalendarIcon, Clock, Users, PlusCircle, Trash2, Eye, Car, Loader2, Lock, DollarSign, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -106,8 +106,8 @@ const PublishTrip = () => {
         fumeur: smoking,
         genre: genre || undefined,
       });
-      toast({ title: "Trajet publié !", description: `${departure} → ${arrival} le ${format(date!, "d MMMM yyyy", { locale: fr })}` });
-      navigate("/");
+      toast({ title: "Trajet soumis !", description: `${departure} → ${arrival} le ${format(date!, "d MMMM yyyy", { locale: fr })}. En attente d'approbation par l'administrateur.` });
+      navigate("/mes-trajets");
     } catch (err: any) {
       const errors = err?.response?.data?.errors;
       if (errors) {
@@ -126,6 +126,9 @@ const PublishTrip = () => {
   return (
     <Layout>
       <div className="container py-8 max-w-3xl">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate("/mes-trajets")}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <h1 className="text-3xl font-bold mb-2">Publier un trajet</h1>
         <p className="text-muted-foreground mb-8">Partagez votre itinéraire et vos frais avec d'autres voyageurs.</p>
 
@@ -298,7 +301,7 @@ const PublishTrip = () => {
               </CardContent>
             </Card>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setPreview(false)}>Modifier</Button>
+              <Button variant="outline" className="flex-1" onClick={() => setPreview(false)}>Modifier</Button>
               <Button className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold" onClick={handlePublish} disabled={loading}>
                 {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Publication...</> : "Confirmer et publier"}
               </Button>

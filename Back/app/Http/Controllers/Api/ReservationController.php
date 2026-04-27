@@ -31,23 +31,47 @@ class ReservationController extends Controller
             return response()->json(['message' => 'Vous ne pouvez pas réserver votre propre trajet.'], 422);
         }
 
-        if ($trajet->placesDisponibles() < $validated['nb_places_reservees']) {
+        // Check for an existing active reservation by this user on this trajet
+        $existing = Reservation::where('voyageur_id', $request->user()->id)
+            ->where('trajet_id', $trajet->id)
+            ->whereIn('statut', ['en_attente', 'confirmee'])
+            ->first();
+
+        // Calculate available places (exclude the existing reservation's seats if updating)
+        $disponibles = $trajet->placesDisponibles() + ($existing ? $existing->nb_places_reservees : 0);
+
+        if ($disponibles < $validated['nb_places_reservees']) {
             return response()->json(['message' => 'Nombre de places insuffisant.'], 422);
         }
 
-        $reservation = Reservation::create([
-            'voyageur_id'         => $request->user()->id,
-            'trajet_id'           => $trajet->id,
-            'date_reservation'    => now(),
-            'nb_places_reservees' => $validated['nb_places_reservees'],
-            'statut'              => 'en_attente',
-        ]);
+        if ($existing) {
+            // Update the existing reservation instead of creating a duplicate
+            $existing->update([
+                'nb_places_reservees' => $validated['nb_places_reservees'],
+                'date_reservation'    => now(),
+                'statut'              => 'en_attente',
+            ]);
 
-        // Notification au conducteur
-        Notification::create([
-            'user_id' => $trajet->conducteur_id,
-            'message' => "Nouvelle réservation de {$request->user()->name} pour votre trajet {$trajet->depart} → {$trajet->destination}.",
-        ]);
+            $reservation = $existing->fresh();
+
+            Notification::create([
+                'user_id' => $trajet->conducteur_id,
+                'message' => "{$request->user()->name} a modifié sa réservation pour votre trajet {$trajet->depart} → {$trajet->destination}.",
+            ]);
+        } else {
+            $reservation = Reservation::create([
+                'voyageur_id'         => $request->user()->id,
+                'trajet_id'           => $trajet->id,
+                'date_reservation'    => now(),
+                'nb_places_reservees' => $validated['nb_places_reservees'],
+                'statut'              => 'en_attente',
+            ]);
+
+            Notification::create([
+                'user_id' => $trajet->conducteur_id,
+                'message' => "Nouvelle réservation de {$request->user()->name} pour votre trajet {$trajet->depart} → {$trajet->destination}.",
+            ]);
+        }
 
         return response()->json([
             'message'     => 'Réservation effectuée.',

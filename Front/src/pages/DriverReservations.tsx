@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CheckCircle2, XCircle, Loader2, Lock, Car, Clock, MapPin, Users, ArrowRight, AlertCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Lock, Car, Clock, MapPin, Users, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/api";
@@ -161,6 +161,9 @@ const DriverReservations = () => {
   return (
     <Layout>
       <div className="container py-8 max-w-4xl">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate("/")}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Réservations reçues</h1>
           <p className="text-muted-foreground">Gérez les demandes de réservation pour vos trajets</p>

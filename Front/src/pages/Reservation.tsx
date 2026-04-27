@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight, Loader2, Lock, AlertCircle } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Lock, AlertCircle, ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -166,6 +166,9 @@ const Reservation = () => {
   return (
     <Layout>
       <div className="container py-8 max-w-3xl">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate(`/trajet/${id}`)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <h1 className="text-3xl font-bold mb-2">Réserver votre trajet</h1>
         <p className="text-muted-foreground mb-8">Vérifiez les détails et confirmez votre réservation.</p>
 

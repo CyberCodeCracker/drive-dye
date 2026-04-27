@@ -14,6 +14,7 @@ import Reservation from "./pages/Reservation.tsx";
 import ReviewTrip from "./pages/ReviewTrip.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import DriverReservations from "./pages/DriverReservations.tsx";
+import MesTrajets from "./pages/MesTrajets.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ScrollToTopButton from "./components/ScrollToTop.tsx";
 
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/evaluer/:id" element={<ReviewTrip />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/mes-reservations" element={<DriverReservations />} />
+              <Route path="/mes-trajets" element={<MesTrajets />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

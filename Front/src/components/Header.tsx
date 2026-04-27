@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Car, Menu, X, Search, PlusCircle, User, LayoutDashboard,
-  LogOut, Bell, ChevronDown, Settings, BookOpen, Home, Sun, Moon,
+  LogOut, Bell, ChevronDown, Settings, BookOpen, Home, Sun, Moon, Route,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,16 +51,18 @@ const Header = () => {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {/* Bouton Home */}
-          <Link to="/">
-            <Button
-              variant={location.pathname === "/" ? "default" : "ghost"}
-              size="icon"
-              title="Accueil"
-              aria-label="Accueil"
-            >
-              <Home className="h-4 w-4" />
-            </Button>
-          </Link>
+          {!isAdmin && (
+            <Link to="/">
+              <Button
+                variant={location.pathname === "/" ? "default" : "ghost"}
+                size="icon"
+                title="Accueil"
+                aria-label="Accueil"
+              >
+                <Home className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
 
           {navLinks.map((link) => (
             <Link key={link.to} to={link.to}>
@@ -124,14 +126,22 @@ const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/")} className="cursor-pointer gap-2">
-                    <Home className="h-4 w-4" />
-                    Accueil
-                  </DropdownMenuItem>
+                  {!isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/")} className="cursor-pointer gap-2">
+                      <Home className="h-4 w-4" />
+                      Accueil
+                    </DropdownMenuItem>
+                  )}
                   {isDriver && (
                     <DropdownMenuItem onClick={() => navigate("/publier")} className="cursor-pointer gap-2">
                       <PlusCircle className="h-4 w-4" />
                       Publier un trajet
+                    </DropdownMenuItem>
+                  )}
+                  {isDriver && (
+                    <DropdownMenuItem onClick={() => navigate("/mes-trajets")} className="cursor-pointer gap-2">
+                      <Route className="h-4 w-4" />
+                      Mes trajets
                     </DropdownMenuItem>
                   )}
                   {isDriver && (
@@ -179,12 +189,14 @@ const Header = () => {
       {/* Mobile nav */}
       {mobileOpen && (
         <div className="md:hidden border-t bg-card p-4 space-y-2">
-          <Link to="/" onClick={() => setMobileOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Home className="h-4 w-4" />
-              Accueil
-            </Button>
-          </Link>
+          {!isAdmin && (
+            <Link to="/" onClick={() => setMobileOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start gap-2">
+                <Home className="h-4 w-4" />
+                Accueil
+              </Button>
+            </Link>
+          )}
           {navLinks.map((link) => (
             <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full justify-start gap-2">
@@ -204,6 +216,12 @@ const Header = () => {
                 <Button variant="secondary" className="w-full justify-start gap-2" onClick={() => { navigate("/publier"); setMobileOpen(false); }}>
                   <PlusCircle className="h-4 w-4" />
                   Publier un trajet
+                </Button>
+              )}
+              {isDriver && (
+                <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => { navigate("/mes-trajets"); setMobileOpen(false); }}>
+                  <Route className="h-4 w-4" />
+                  Mes trajets
                 </Button>
               )}
               {isDriver && (

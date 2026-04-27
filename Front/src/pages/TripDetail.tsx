@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MapPin, Users, Music, MessageCircle, Cigarette, Dog, Package, Car, Shield, ArrowRight, Loader2, Calendar, AlertCircle } from "lucide-react";
+import { Star, MapPin, Users, Music, MessageCircle, Cigarette, Dog, Package, Car, Shield, ArrowRight, Loader2, Calendar, AlertCircle, CheckCircle2, XCircle, BookOpen, Clock, ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import api from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface Conducteur {
   id: number;
@@ -26,6 +27,15 @@ interface Avis {
   voyageur: { id: number; name: string };
 }
 
+interface ReservationItem {
+  id: number;
+  voyageur_id: number;
+  nb_places_reservees: number;
+  date_reservation: string;
+  statut: string;
+  voyageur: { id: number; name: string; email: string };
+}
+
 interface Trajet {
   id: number;
   depart: string;
@@ -40,6 +50,7 @@ interface Trajet {
   genre?: string;
   statut: string;
   conducteur: Conducteur;
+  reservations?: ReservationItem[];
 }
 
 const TripDetail = () => {
@@ -52,6 +63,10 @@ const TripDetail = () => {
   const [noteMoyenne, setNoteMoyenne] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showReservations, setShowReservations] = useState(false);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const isOwner = user && trajet?.conducteur?.id === user.id;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,9 +137,57 @@ const TripDetail = () => {
     ...(trajet.genre ? [{ key: "genre", icon: MessageCircle, label: `Genre : ${trajet.genre}` }] : []),
   ];
 
+  const handleConfirm = async (resId: number) => {
+    setActionLoading(resId);
+    try {
+      await api.put(`/reservations/${resId}/confirm`);
+      setTrajet((prev) =>
+        prev ? { ...prev, reservations: prev.reservations?.map((r) => r.id === resId ? { ...r, statut: "confirmee" } : r) } : prev
+      );
+      toast({ title: "Réservation confirmée" });
+    } catch (err: any) {
+      toast({ title: "Erreur", description: err?.response?.data?.message || "Impossible de confirmer.", variant: "destructive" });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (resId: number) => {
+    setActionLoading(resId);
+    try {
+      await api.put(`/reservations/${resId}/reject`);
+      setTrajet((prev) =>
+        prev ? { ...prev, reservations: prev.reservations?.map((r) => r.id === resId ? { ...r, statut: "annulee" } : r) } : prev
+      );
+      toast({ title: "Réservation refusée" });
+    } catch (err: any) {
+      toast({ title: "Erreur", description: err?.response?.data?.message || "Impossible de refuser.", variant: "destructive" });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const getResBadge = (statut: string) => {
+    switch (statut) {
+      case "en_attente":
+        return <Badge className="bg-amber-500/10 text-amber-600 border-0 gap-1"><Clock className="h-3 w-3" />En attente</Badge>;
+      case "confirmee":
+        return <Badge className="bg-primary/10 text-primary border-0 gap-1"><CheckCircle2 className="h-3 w-3" />Confirmée</Badge>;
+      case "annulee":
+        return <Badge className="bg-destructive/10 text-destructive border-0 gap-1"><XCircle className="h-3 w-3" />Annulée</Badge>;
+      default:
+        return <Badge variant="secondary" className="capitalize">{statut}</Badge>;
+    }
+  };
+
+  const activeReservations = trajet.reservations?.filter((r) => r.statut !== "annulee") ?? [];
+
   return (
     <Layout>
       <div className="container py-8">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main */}
           <div className="lg:col-span-2 space-y-6">
@@ -172,6 +235,78 @@ const TripDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Driver reservations section */}
+            {isOwner && (
+              <Card className="border-0 shadow-md">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    Réservations ({activeReservations.length})
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowReservations(!showReservations)}
+                  >
+                    {showReservations ? "Masquer" : "Voir les réservations"}
+                  </Button>
+                </CardHeader>
+                {showReservations && (
+                  <CardContent className="space-y-3 pt-2">
+                    {activeReservations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground py-4 text-center">Aucune réservation pour ce trajet.</p>
+                    ) : (
+                      activeReservations.map((res) => (
+                        <div key={res.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg bg-muted/50">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+                              <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                {res.voyageur.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold text-sm">{res.voyageur.name}</p>
+                              <p className="text-xs text-muted-foreground">{res.voyageur.email}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                <Users className="h-3 w-3 inline mr-1" />
+                                {res.nb_places_reservees} place{res.nb_places_reservees > 1 ? "s" : ""}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {getResBadge(res.statut)}
+                            {res.statut === "en_attente" && (
+                              <>
+                                <Button
+                                  size="icon"
+                                  className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 w-8 rounded-full"
+                                  disabled={actionLoading === res.id}
+                                  onClick={() => handleConfirm(res.id)}
+                                  title="Confirmer"
+                                >
+                                  {actionLoading === res.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="text-destructive border-destructive/40 hover:bg-destructive/10 h-8 w-8 rounded-full"
+                                  disabled={actionLoading === res.id}
+                                  onClick={() => handleReject(res.id)}
+                                  title="Refuser"
+                                >
+                                  {actionLoading === res.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                )}
+              </Card>
+            )}
 
             {/* Reviews */}
             <Card className="border-0 shadow-md">

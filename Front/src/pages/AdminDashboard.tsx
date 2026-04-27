@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Users, Car, CalendarCheck, TrendingUp, Trash2, Ban, CheckCircle, Loader2, Lock, ShieldAlert } from "lucide-react";
+import { Users, Car, CalendarCheck, TrendingUp, Trash2, Ban, CheckCircle, Loader2, Lock, ShieldAlert, Clock, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/api";
@@ -20,6 +20,7 @@ interface DashboardStats {
   total_conducteurs: number;
   total_trajets: number;
   trajets_actifs: number;
+  trajets_en_attente: number;
   total_reservations: number;
   reservations_confirmees: number;
   reservations_en_attente: number;
@@ -55,6 +56,9 @@ const AdminDashboard = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [loadingTrajets, setLoadingTrajets] = useState(true);
+  const [pendingTrajets, setPendingTrajets] = useState<AdminTrajet[]>([]);
+  const [loadingPending, setLoadingPending] = useState(true);
+  const [approveLoading, setApproveLoading] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -62,12 +66,17 @@ const AdminDashboard = () => {
     api.get("/admin/dashboard").then(({ data }) => setStats(data)).catch(() => {}).finally(() => setLoadingStats(false));
     api.get("/admin/users").then(({ data }) => setUsers(data.data ?? data)).catch(() => {}).finally(() => setLoadingUsers(false));
     api.get("/admin/trajets").then(({ data }) => setTrajets(data.data ?? data)).catch(() => {}).finally(() => setLoadingTrajets(false));
+    api.get("/admin/trajets?statut=en_attente").then(({ data }) => setPendingTrajets(data.data ?? data)).catch(() => {}).finally(() => setLoadingPending(false));
   }, [isAdmin]);
 
   const handleBlockUser = async (user: AdminUser) => {
     try {
       const { data } = await api.put(`/admin/users/${user.id}/block`);
       setUsers(prev => prev.map(u => u.id === user.id ? data.user : u));
+      setStats(prev => prev ? {
+        ...prev,
+        users_bloques: prev.users_bloques + (data.user.is_blocked ? 1 : -1),
+      } : prev);
       toast({ title: data.message });
     } catch {
       toast({ title: "Erreur", description: "Impossible de modifier cet utilisateur.", variant: "destructive" });
@@ -77,11 +86,54 @@ const AdminDashboard = () => {
   const handleDeleteTrajet = async (trajetId: number) => {
     if (!confirm("Supprimer ce trajet définitivement ?")) return;
     try {
+      const deleted = trajets.find(t => t.id === trajetId);
       await api.delete(`/admin/trajets/${trajetId}`);
       setTrajets(prev => prev.filter(t => t.id !== trajetId));
+      setStats(prev => prev ? {
+        ...prev,
+        total_trajets: prev.total_trajets - 1,
+        trajets_actifs: prev.trajets_actifs - (deleted?.statut === "actif" ? 1 : 0),
+      } : prev);
       toast({ title: "Trajet supprimé." });
     } catch {
       toast({ title: "Erreur", description: "Impossible de supprimer ce trajet.", variant: "destructive" });
+    }
+  };
+
+  const handleApprove = async (trajetId: number) => {
+    setApproveLoading(trajetId);
+    try {
+      const { data } = await api.put(`/admin/trajets/${trajetId}/approve`);
+      setPendingTrajets(prev => prev.filter(t => t.id !== trajetId));
+      setTrajets(prev => prev.map(t => t.id === trajetId ? data.trajet : t));
+      setStats(prev => prev ? {
+        ...prev,
+        trajets_en_attente: prev.trajets_en_attente - 1,
+        trajets_actifs: prev.trajets_actifs + 1,
+      } : prev);
+      toast({ title: "Trajet approuvé" });
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'approuver ce trajet.", variant: "destructive" });
+    } finally {
+      setApproveLoading(null);
+    }
+  };
+
+  const handleReject = async (trajetId: number) => {
+    setApproveLoading(trajetId);
+    try {
+      const { data } = await api.put(`/admin/trajets/${trajetId}/reject`);
+      setPendingTrajets(prev => prev.filter(t => t.id !== trajetId));
+      setTrajets(prev => prev.map(t => t.id === trajetId ? data.trajet : t));
+      setStats(prev => prev ? {
+        ...prev,
+        trajets_en_attente: prev.trajets_en_attente - 1,
+      } : prev);
+      toast({ title: "Trajet refusé" });
+    } catch {
+      toast({ title: "Erreur", description: "Impossible de refuser ce trajet.", variant: "destructive" });
+    } finally {
+      setApproveLoading(null);
     }
   };
 
@@ -118,7 +170,7 @@ const AdminDashboard = () => {
 
   const statCards = stats ? [
     { label: "Utilisateurs", value: stats.total_users.toLocaleString(), sub: `${stats.total_voyageurs} voyageurs · ${stats.total_conducteurs} conducteurs`, icon: Users, color: "text-primary" },
-    { label: "Trajets", value: stats.total_trajets.toLocaleString(), sub: `${stats.trajets_actifs} actifs`, icon: Car, color: "text-secondary" },
+    { label: "Trajets", value: stats.total_trajets.toLocaleString(), sub: `${stats.trajets_actifs} actifs · ${stats.trajets_en_attente} en attente`, icon: Car, color: "text-secondary" },
     { label: "Réservations", value: stats.total_reservations.toLocaleString(), sub: `${stats.reservations_confirmees} confirmées · ${stats.reservations_en_attente} en attente`, icon: CalendarCheck, color: "text-primary" },
     { label: "Utilisateurs bloqués", value: stats.users_bloques.toLocaleString(), sub: "comptes suspendus", icon: Ban, color: "text-destructive" },
   ] : [];
@@ -185,11 +237,76 @@ const AdminDashboard = () => {
         )}
 
         {/* Tabs */}
-        <Tabs defaultValue="trajets">
+        <Tabs defaultValue="demandes">
           <TabsList>
+            <TabsTrigger value="demandes" className="gap-1.5">
+              Demandes
+              {stats && stats.trajets_en_attente > 0 && (
+                <Badge className="bg-amber-500 text-white border-0 h-5 min-w-5 px-1.5 text-xs">{stats.trajets_en_attente}</Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="trajets">Trajets</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="demandes">
+            <Card className="border-0 shadow-md">
+              <CardContent className="p-0">
+                {loadingPending ? (
+                  <div className="flex items-center justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Trajet</TableHead>
+                        <TableHead>Conducteur</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Prix</TableHead>
+                        <TableHead>Places</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingTrajets.length === 0 && (
+                        <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Aucune demande en attente.</TableCell></TableRow>
+                      )}
+                      {pendingTrajets.map((t) => (
+                        <TableRow key={t.id}>
+                          <TableCell className="font-medium">{t.depart} → {t.destination}</TableCell>
+                          <TableCell>{t.conducteur?.name ?? "—"}</TableCell>
+                          <TableCell>{formatDate(t.date_heure)}</TableCell>
+                          <TableCell>{t.prix_min} TND</TableCell>
+                          <TableCell>{t.nb_places}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Approuver"
+                                disabled={approveLoading === t.id}
+                                onClick={() => handleApprove(t.id)}
+                              >
+                                {approveLoading === t.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 text-primary" />}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Refuser"
+                                disabled={approveLoading === t.id}
+                                onClick={() => handleReject(t.id)}
+                              >
+                                {approveLoading === t.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 text-destructive" />}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="trajets">
             <Card className="border-0 shadow-md">
@@ -221,10 +338,11 @@ const AdminDashboard = () => {
                           <TableCell>
                             <Badge className={
                               t.statut === "actif" ? "bg-primary/10 text-primary border-0" :
+                              t.statut === "en_attente" ? "bg-amber-500/10 text-amber-600 border-0" :
                               t.statut === "annule" ? "bg-destructive/10 text-destructive border-0" :
                               "bg-muted text-muted-foreground border-0"
                             }>
-                              {t.statut}
+                              {t.statut === "en_attente" ? "En attente" : t.statut}
                             </Badge>
                           </TableCell>
                           <TableCell>

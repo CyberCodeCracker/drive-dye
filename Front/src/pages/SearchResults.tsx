@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, MapPin, Users, ArrowRight, Filter, Loader2 } from "lucide-react";
+import { Star, MapPin, Users, ArrowRight, Filter, Loader2, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -80,6 +80,9 @@ const SearchResults = () => {
   return (
     <Layout>
       <div className="container py-8">
+        <Button variant="outline" size="icon" className="mb-4 h-9 w-9" onClick={() => navigate("/")}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold">
