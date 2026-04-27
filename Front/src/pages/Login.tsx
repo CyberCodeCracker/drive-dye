@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Car, User, Mail, Lock, Phone, AlertCircle, Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
+import { Car, User, Mail, Lock, Phone, AlertCircle, Eye, EyeOff, ArrowRight, ArrowLeft, Home } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type LoginFieldErrors = {
@@ -497,11 +497,15 @@ const Login = () => {
           </CardContent>
         </Card>
 
-        <p className="text-center text-sm text-white/60 mt-4">
-          <button onClick={() => navigate("/")} className="hover:text-primary transition-colors">
-            ← Retour à l'accueil
+        <div className="flex justify-center mt-5">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-sm backdrop-blur border border-white/20 shadow transition-all hover:scale-105 active:scale-95"
+          >
+            <Home className="h-4 w-4" />
+            Retour à l'accueil
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );

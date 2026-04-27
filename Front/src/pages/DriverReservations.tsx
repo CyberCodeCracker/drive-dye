@@ -222,23 +222,25 @@ const DriverReservations = () => {
                         {isPending && (
                           <div className="flex gap-2">
                             <Button
-                              size="sm"
-                              className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1"
+                              size="icon"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground h-9 w-9 rounded-full"
                               disabled={isLoading}
                               onClick={() => handleConfirm(reservation)}
+                              title="Confirmer la réservation"
+                              aria-label="Confirmer"
                             >
-                              {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                              Confirmer
+                              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                             </Button>
                             <Button
-                              size="sm"
+                              size="icon"
                               variant="outline"
-                              className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1"
+                              className="text-destructive border-destructive/40 hover:bg-destructive/10 h-9 w-9 rounded-full"
                               disabled={isLoading}
                               onClick={() => handleReject(reservation)}
+                              title="Refuser la réservation"
+                              aria-label="Refuser"
                             >
-                              {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
-                              Refuser
+                              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
                             </Button>
                           </div>
                         )}

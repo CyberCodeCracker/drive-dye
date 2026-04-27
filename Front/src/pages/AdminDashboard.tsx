@@ -217,7 +217,7 @@ const AdminDashboard = () => {
                           <TableCell className="font-medium">{t.depart} → {t.destination}</TableCell>
                           <TableCell>{t.conducteur?.name ?? "—"}</TableCell>
                           <TableCell>{formatDate(t.date_heure)}</TableCell>
-                          <TableCell>{t.prix_min} €</TableCell>
+                          <TableCell>{t.prix_min} TND</TableCell>
                           <TableCell>
                             <Badge className={
                               t.statut === "actif" ? "bg-primary/10 text-primary border-0" :
@@ -228,7 +228,13 @@ const AdminDashboard = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteTrajet(t.id)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Supprimer ce trajet"
+                              aria-label="Supprimer"
+                              onClick={() => handleDeleteTrajet(t.id)}
+                            >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </TableCell>

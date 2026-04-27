@@ -10,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { MapPin, CalendarIcon, Clock, Euro, Users, PlusCircle, Trash2, Eye, Car, Loader2, Lock } from "lucide-react";
+import { MapPin, CalendarIcon, Clock, Users, PlusCircle, Trash2, Eye, Car, Loader2, Lock, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -215,17 +215,17 @@ const PublishTrip = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Prix min par passager (€) *</Label>
+                    <Label>Prix min par passager (TND) *</Label>
                     <div className="relative">
-                      <Euro className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input type="number" min="1" placeholder="20" value={prixMin} onChange={(e) => { setPrixMin(e.target.value); setErrors(p => ({ ...p, prixMin: "" })); }} className={cn("pl-9", errorClass("prixMin"))} />
                     </div>
                     {errors.prixMin && <p className="text-sm text-destructive">{errors.prixMin}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Prix max par passager (€) *</Label>
+                    <Label>Prix max par passager (TND) *</Label>
                     <div className="relative">
-                      <Euro className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input type="number" min="1" placeholder="35" value={prixMax} onChange={(e) => { setPrixMax(e.target.value); setErrors(p => ({ ...p, prixMax: "" })); }} className={cn("pl-9", errorClass("prixMax"))} />
                     </div>
                     {errors.prixMax && <p className="text-sm text-destructive">{errors.prixMax}</p>}
@@ -289,7 +289,7 @@ const PublishTrip = () => {
                   <p><strong>Trajet :</strong> {departure} → {arrival}</p>
                   <p><strong>Date :</strong> {date ? format(date, "d MMMM yyyy", { locale: fr }) : "—"} à {time}</p>
                   <p><strong>Places :</strong> {seats}</p>
-                  <p><strong>Prix :</strong> {prixMin} € — {prixMax} € / passager</p>
+                  <p><strong>Prix :</strong> {prixMin} TND — {prixMax} TND / passager</p>
                   {vehicleType && <p><strong>Véhicule :</strong> {vehicleType}</p>}
                   {bagage && <p><strong>Bagages :</strong> {bagage}</p>}
                   {genre && <p><strong>Genre :</strong> {genre}</p>}

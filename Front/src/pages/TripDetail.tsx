@@ -133,7 +133,7 @@ const TripDetail = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h1 className="text-2xl font-bold">{trajet.depart} → {trajet.destination}</h1>
-                  <Badge className="bg-primary/10 text-primary border-0 text-lg px-4 py-1">{trajet.prix_min} €</Badge>
+                  <Badge className="bg-primary/10 text-primary border-0 text-lg px-4 py-1">{trajet.prix_min} TND</Badge>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
@@ -256,7 +256,7 @@ const TripDetail = () => {
             <Card className="border-0 shadow-lg bg-primary text-primary-foreground">
               <CardContent className="p-6 space-y-4">
                 <div className="text-center">
-                  <p className="text-3xl font-extrabold">{trajet.prix_min} €</p>
+                  <p className="text-3xl font-extrabold">{trajet.prix_min} TND</p>
                   <p className="text-primary-foreground/80 text-sm">par passager</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-sm">

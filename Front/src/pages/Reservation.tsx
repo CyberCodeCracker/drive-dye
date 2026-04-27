@@ -144,7 +144,7 @@ const Reservation = () => {
               <p className="font-semibold">{trajet.depart} → {trajet.destination}</p>
               <p className="text-sm text-muted-foreground">{date} • {time}</p>
               <p className="text-sm">Conducteur : {trajet.conducteur.name}</p>
-              <p className="font-bold text-primary text-lg">Total estimé : {total} €</p>
+              <p className="font-bold text-primary text-lg">Total estimé : {total} TND</p>
             </CardContent>
           </Card>
           <div className="flex gap-3 justify-center flex-wrap">
@@ -220,16 +220,16 @@ const Reservation = () => {
                 <h3 className="font-bold text-lg">Détail du prix</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>{trajet.prix_min} € × {seats} passager{seats > 1 ? "s" : ""}</span>
-                    <span>{total} €</span>
+                    <span>{trajet.prix_min} TND × {seats} passager{seats > 1 ? "s" : ""}</span>
+                    <span>{total} TND</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Frais de service</span>
-                    <span>0 €</span>
+                    <span>0 TND</span>
                   </div>
                   <div className="border-t pt-2 flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span className="text-primary">{total} €</span>
+                    <span className="text-primary">{total} TND</span>
                   </div>
                 </div>
                 {isOwnTrip && (

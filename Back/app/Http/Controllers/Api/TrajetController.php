@@ -28,6 +28,9 @@ class TrajetController extends Controller
             $query->whereDate('date_heure', $request->date);
         }
 
+        // Exclure les trajets complets (aucune place disponible)
+        $query->avecPlaces();
+
         $trajets = $query->orderBy('date_heure', 'asc')->paginate(9);
 
         return response()->json($trajets);
@@ -75,6 +78,9 @@ class TrajetController extends Controller
         if ($request->filled('nb_places')) {
             $query->where('nb_places', '>=', $request->nb_places);
         }
+
+        // Exclure les trajets complets (aucune place disponible)
+        $query->avecPlaces();
 
         $trajets = $query->orderBy('date_heure', 'asc')->paginate(15);
 

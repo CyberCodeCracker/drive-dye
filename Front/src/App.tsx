@@ -15,6 +15,7 @@ import ReviewTrip from "./pages/ReviewTrip.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import DriverReservations from "./pages/DriverReservations.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ScrollToTopButton from "./components/ScrollToTop.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,13 +32,13 @@ const HomeRedirect = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="covoitfacile-theme">
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
+              <Routes>
               <Route path="/" element={<HomeRedirect />} />
               <Route path="/login" element={<Login />} />
               <Route path="/recherche" element={<SearchResults />} />

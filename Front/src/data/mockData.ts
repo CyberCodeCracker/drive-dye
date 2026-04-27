@@ -68,12 +68,12 @@ export const reviews: Review[] = [
 ];
 
 export const popularRoutes = [
-  { from: 'Paris', to: 'Lyon', price: 28, image: '🏙️' },
-  { from: 'Paris', to: 'Bordeaux', price: 35, image: '🍷' },
-  { from: 'Lyon', to: 'Marseille', price: 25, image: '🌊' },
-  { from: 'Toulouse', to: 'Montpellier', price: 15, image: '☀️' },
-  { from: 'Lille', to: 'Paris', price: 18, image: '🚄' },
-  { from: 'Nantes', to: 'Rennes', price: 12, image: '🌿' },
+  { from: 'Tunis',    to: 'Sfax',      price: 18, image: '🏛️' },
+  { from: 'Tunis',    to: 'Sousse',    price: 12, image: '🌊' },
+  { from: 'Sfax',     to: 'Gabès',     price: 10, image: '🌴' },
+  { from: 'Sousse',   to: 'Monastir',  price:  6, image: '☀️' },
+  { from: 'Bizerte',  to: 'Tunis',     price:  8, image: '⚓' },
+  { from: 'Kairouan', to: 'Sousse',    price:  9, image: '🕌' },
 ];
 
 export const adminStats = {

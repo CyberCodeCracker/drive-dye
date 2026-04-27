@@ -222,7 +222,7 @@ const Index = () => {
                           </div>
                           <span className="font-medium text-sm">{trajet.conducteur.name}</span>
                         </div>
-                        <span className="text-xl font-extrabold text-primary">{trajet.prix_min} €</span>
+                        <span className="text-xl font-extrabold text-primary">{trajet.prix_min} TND</span>
                       </div>
                       <div className="flex items-center gap-3 text-sm">
                         <div className="flex items-center gap-1">
@@ -304,7 +304,7 @@ const Index = () => {
                     <span className="text-3xl">{route.image}</span>
                     <div>
                       <p className="font-semibold">{route.from} → {route.to}</p>
-                      <p className="text-sm text-muted-foreground">À partir de {route.price} €</p>
+                      <p className="text-sm text-muted-foreground">À partir de {route.price} TND</p>
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />

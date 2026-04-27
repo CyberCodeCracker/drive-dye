@@ -110,7 +110,7 @@ const SearchResults = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold mb-3 block">Prix max : {maxPrice[0]} €</label>
+                  <label className="text-sm font-semibold mb-3 block">Prix max : {maxPrice[0]} TND</label>
                   <Slider value={maxPrice} onValueChange={setMaxPrice} max={200} step={5} />
                 </div>
                 <div className="space-y-3">
@@ -180,7 +180,7 @@ const SearchResults = () => {
                         {trajet.nb_places} place{trajet.nb_places > 1 ? "s" : ""}
                       </div>
                       {trajet.fumeur && <Badge variant="secondary" className="text-xs">Fumeur OK</Badge>}
-                      <p className="text-2xl font-extrabold text-primary">{trajet.prix_min} €</p>
+                      <p className="text-2xl font-extrabold text-primary">{trajet.prix_min} TND</p>
                     </div>
                   </div>
                 </CardContent>

@@ -49,6 +49,21 @@ class Trajet extends Model
             ->whereIn('statut', ['en_attente', 'confirmee'])
             ->sum('nb_places_reservees');
 
-        return $this->nb_places - $placesReservees;
+        return max(0, $this->nb_places - $placesReservees);
+    }
+
+    /**
+     * Scope : exclure les trajets sans place disponible
+     */
+    public function scopeAvecPlaces($query)
+    {
+        return $query->whereRaw(
+            "nb_places > (
+                SELECT COALESCE(SUM(nb_places_reservees), 0)
+                FROM reservations
+                WHERE reservations.trajet_id = trajets.id
+                AND reservations.statut IN ('en_attente', 'confirmee')
+            )"
+        );
     }
 }
