@@ -1,0 +1,52 @@
+<?php
+
+return [
+    'accepted' => 'Le champ :attribute doit être accepté.',
+    'after' => 'Le champ :attribute doit être une date postérieure à :date.',
+    'boolean' => 'Le champ :attribute doit être vrai ou faux.',
+    'confirmed' => 'La confirmation du champ :attribute ne correspond pas.',
+    'email' => 'Le champ :attribute doit être une adresse email valide.',
+    'exists' => 'Le champ :attribute sélectionné est invalide.',
+    'gte' => [
+        'numeric' => 'Le champ :attribute doit être supérieur ou égal à :value.',
+    ],
+    'in' => 'Le champ :attribute sélectionné est invalide.',
+    'integer' => 'Le champ :attribute doit être un nombre entier.',
+    'max' => [
+        'string' => 'Le champ :attribute ne doit pas dépasser :max caractères.',
+        'numeric' => 'Le champ :attribute ne doit pas être supérieur à :max.',
+    ],
+    'min' => [
+        'string' => 'Le champ :attribute doit contenir au moins :min caractères.',
+        'numeric' => 'Le champ :attribute doit être au moins :min.',
+    ],
+    'nullable' => 'Le champ :attribute peut être nul.',
+    'numeric' => 'Le champ :attribute doit être un nombre.',
+    'required' => 'Le champ :attribute est obligatoire.',
+    'sometimes' => 'Le champ :attribute est parfois requis.',
+    'string' => 'Le champ :attribute doit être une chaîne de caractères.',
+    'unique' => 'La valeur du champ :attribute est déjà utilisée.',
+
+    'attributes' => [
+        'name' => 'nom',
+        'email' => 'email',
+        'password' => 'mot de passe',
+        'password_confirmation' => 'confirmation du mot de passe',
+        'phone' => 'téléphone',
+        'role' => 'rôle',
+        'depart' => 'départ',
+        'destination' => 'destination',
+        'date_heure' => 'date et heure',
+        'nb_places' => 'nombre de places',
+        'prix_min' => 'prix minimum',
+        'prix_max' => 'prix maximum',
+        'type_vehicule' => 'type de véhicule',
+        'bagage' => 'bagage',
+        'fumeur' => 'fumeur',
+        'genre' => 'genre',
+        'trajet_id' => 'trajet',
+        'nb_places_reservees' => 'nombre de places réservées',
+        'note' => 'note',
+        'commentaire' => 'commentaire',
+    ],
+];
